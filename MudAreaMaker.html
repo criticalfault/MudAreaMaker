@@ -2,21 +2,23 @@
 <html>
 <head>
 	<title>Mud Area Maker</title>
-	<!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
-<!-- jQuery library -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-<!-- Latest compiled JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<style type="text/css">
-		body{text-align: center;}
-		.roomEdit
-		{			
-			
-			margin-bottom: 10px;
 
+		html, body, #wrapper
+		{
+		   height:100%;
+		   width: 100%;
+		   margin: 0;
+		   padding: 0;
+		   border: 0;
+		   text-align: center;
+		}
+		.roomEdit
+		{		
+			margin-bottom: 10px;
 		}
 		.areaControls
 		{
@@ -30,34 +32,40 @@
 		}
 		#outputModal
 		{
-			position: absolute;
-			z-index: 2;
-			top:15%;
-			left:15%;
-			width:500px;
-			height:500px;
-			display: none;
+		   padding: 20px;
+		   position: absolute;
+		   top: 50%;
+		   left: 50%;
+		   width: 500px;
+		   height: 500px;
+		   margin-top: -250px; /* Half the height */
+		   margin-left: -250px; /* Half the width */
+		   border-radius: 25px;
+		   background-color: grey;
+		   display: none;	   
 		}
 		#output
 		{
-			width: 200px;
-			height: 200px;
+			height:100%;
+			width: 100%;
 		}
 		#loadModal
 		{
 			text-align: left;		
 			border: solid black 2px;
 			background-color: white;
-			display: none;
 			position: absolute;
-			width:250px;
-			height:250px;
+			display: none;
+			top: 50%;
+			left: 50%;
+			width: 500px;
+			height: 500px;
+			margin-top: -250px; /* Half the height */
+			margin-left: -250px; /* Half the width */
+			border-radius: 25px;
 			z-index: 2;
-			left: 0; 
-			right: 0; 
-			margin-left: auto; 
-			margin-right: auto; 
 			border-radius: 20px;
+			padding-left: 30px;
 		}
 		#loadModal h2
 		{
@@ -89,11 +97,12 @@
   			crossorigin="anonymous"></script>
 </head>
 <body>
+<div id='wrapper'>
 	<div id='outputModal'>
-		<i id='outputClose' style="font-size: 30px;" onclick="closeModal()" class='fa fa-minus-circle'></i>
-		<textarea id="output">
+		<textarea class="form-control"  id="output">
 			
 		</textarea>
+		<i id='outputClose' style="font-size: 30px;float:right;cursor:pointer;margin-top: -42px;" onclick="closeModal()" class='btn btn-danger fa fa-minus-circle'></i>
 	</div>
 	<div id="loadModal">
 		
@@ -103,7 +112,7 @@
 	<div class='alert alert-dismissable alert-info'>Area Maker uses local storage for saving. If you delete your cache, you will lose all off your saved data! Clicking the new button will delete your current area! Don't forget to save!<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a></div>
 	<fieldset class="areaControls">
 		<legend>Area Info</legend>
-			Area Name:<input class="form-inline form-control" placeholder="Area Name" type="text" id="AreaName" name="AreaName"/><br/>
+			Area Name:<input spellcheck="true" class="form-inline form-control" placeholder="Area Name" type="text" id="AreaName" name="AreaName"/><br/>
 		<button class='btn btn-sm btn-info' onclick="SaveArea()">Save <i class="fa fa-floppy-o" aria-hidden="true"></i></button>
 		<button class='btn btn-sm btn-info' onclick="LoadOpen()">Load <i class="fa fa-cloud" aria-hidden="true"></i></button>
 		<button class='btn btn-sm btn-warning' onclick="NewArea()">New <i class="fa fa-globe" aria-hidden="true"></i></button>
@@ -117,11 +126,14 @@
 		<button class='btn btn-lg btn-default' onclick="RoomLeft()"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
 		<button class='btn btn-lg btn-default' onclick="RoomRight()"><i class="fa fa-arrow-right" aria-hidden="true"></i></button>
 		<br/>
-		<p>Room # <input class='form-control' type="text" value="0" id='roomId'/></p><br/>
-		<p>Title:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="form-control" id="roomTitle" type="text" name="roomTitle"></p><br/><br/>
+		<p>Room # <input class='form-control' type="text" id='roomId'/></p><br/>
+		<p>Title:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input spellcheck="true" class="form-control" id="roomTitle" type="text" name="roomTitle"></p><br/><br/>
 		<p>
-		<textarea  rows="5" id="roomDesc" class="form-control" placeholder="Description Goes Here"></textarea>
+		<textarea spellcheck="true" rows="5" id="roomDesc" class="form-control" placeholder="Description Goes Here"></textarea>
 		</p>
+		<br/>
+		Items: <input placeholder="item:1,item:2,etc" class='form-control' type="text" id='roomItems'/><br/>
+		NPCs: <input placeholder="npc:1,npc:2,etc" class='form-control' type="text" id='roomNpcs'/><br/>
 		<br/>
 		Exits:
 		<button class="btn btn-lg btn-success btn-default" onclick="addExit()"><i class="fa fa-plus-circle" aria-hidden="true"></i></button>
@@ -135,11 +147,9 @@
 		<button class="btn btn-success btn-block btn-default" onclick="RoomUpdate()">Update Room</button>
 	</fieldset>
 	<script type="text/javascript">
-	
 		var rooms =[];
 		var currentId=0;
-		var room = {'id':'','title':'','description':'','exits':[]};
-		console.log(room);
+		var room = {'id':'','title':'','description':'','exits':[],'items':[],'npcs':[]};
 
 		function closeModal()
 		{
@@ -150,7 +160,7 @@
 		{
 			rooms=[];
 			currentId=0;
-			room = {'id':'','title':'','description':'','exits':[]};
+			room = {'id':'','title':'','description':'','exits':[],'items':[],'npcs':[]};
 			
 		}
 		
@@ -171,14 +181,20 @@
 		{
 			rooms =[];
 			$('#loadModal').text('');
-			var str = "<h2>Load Area</h2><hr><form>";
+			var str = "<h2>Load Area</h2><hr><div class='radio'>";
 			for(var key in localStorage)
 			{
 				str += "<label><input name='load' type='radio' value='"+key+"'/> "+key+"</label><br/>";
 				
 			}
-			str+="<br/><button id='loadButton'>Load</button></form>"
+			str+="<br/><button class='btn btn-default' id='loadButton'>Load</button>"+
+			"<button id='loadcloseButton' class='btn btn-default'>Close</button></div>";
 			$(str).appendTo('#loadModal')
+
+			$('#loadcloseButton').click(function(event){
+				event.preventDefault();
+				$('#loadModal').toggle();
+			})
 			$('#loadButton').click(function(event){
 				event.preventDefault();
 				LoadArea(0);
@@ -211,7 +227,7 @@
 			currentId++;
 			if(!rooms[currentId])
 			{
-				rooms.push({'id':'0','title':'Temp Title','description':'Desc','exits':[]});
+				rooms.push( {'id':'0','title':'Temp Title','description':'Desc','exits':[],'items':[],'npcs':[]} );
 			}
 			loadRoom(currentId);
 			$('#NumOfRooms').text((currentId+1)+'/'+rooms.length);
@@ -222,6 +238,15 @@
 			room.id = $('#roomId').val();
 			room.title = $('#roomTitle').val();
 			room.description = $('#roomDesc').val();
+			
+			var items = $('#roomItems').val();
+			items = items.split(',');
+			room.items = items;
+
+			var npcs = $('#roomNpcs').val();
+			room.npcs = npcs.split(',');
+	
+
 			var exits = document.querySelectorAll('.exits')
 			for(var i=0; i< exits.length;i++)
 			{
@@ -233,8 +258,6 @@
 					room.exits.push({'roomId':temp[0],'direction':temp[1]});
 				}	
 			}
-
-
 			rooms[currentId] = room;
 			$('#NumOfRooms').text(currentId+'/'+rooms.length);
 		}
@@ -250,6 +273,20 @@
 			{
 				$('<input value="'+rooms[id].exits[i].roomId+'|'+rooms[id].exits[i].direction+'" class="form-control exits" placeholder="ex: limbo:1|North" type="text" name="exit[]"/><br/>').appendTo('#exitContainer');
 			}
+			var str ="";
+			for(var i=0;i <rooms[id].items.length;i++)
+			{ 
+				str+= rooms[id].items[i]+',';
+			}
+			$("roomItems").val(str.substr(1,str.length-1));
+			str="";
+
+			for(var i=0;i <rooms[id].npcs.length;i++)
+			{ 
+				str+= rooms[id].npcs[i]+',';
+			}
+			$("roomNpcs").val(str.substr(1,str.length-1));
+			str="";
 		}
 		function addExit()
 		{
@@ -261,5 +298,6 @@
 			$('#exitContainer > input:last-of-type,#exitContainer > br:last-of-type ').remove();
 		}
 	</script>
+	</div>
 </body>
 </html>
